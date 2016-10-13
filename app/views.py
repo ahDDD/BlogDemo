@@ -12,7 +12,8 @@ from pprint import pprint
 # Create your views here.
 
 def index(request, tag=None, sort=None):
-
+    print request.session
+    pprint(dir(request.session))
     if tag:
         articles = Article.objects.filter(tag=tag)
     else:
@@ -30,8 +31,8 @@ def index(request, tag=None, sort=None):
         # raise Http404('Empty!')
     except PageNotAnInteger:
         articles = paginator.page(1)
-    print request.user
-    context['user'] = UserProfile.objects.get(belong_to=request.user)
+    if request.user.is_authenticated():
+        context['user'] = UserProfile.objects.get(belong_to=request.user)
     context['paginator'] = paginator
     context['articles'] = articles
     return render(request, 'l7h2.html', context)

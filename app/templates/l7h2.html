@@ -31,9 +31,13 @@
                 <p>
                     {{ request.path }}
                 </p>
+                {% if request.user.is_authenticated %}
                 <p>
                     Last Visit:  {{ user.last_visit_dt|date:"Y-m-d G:i" }}
                 </p>
+                    {% else %}
+                    <p>你还没有登录, <a href="{% url 'login' %}">点击登录</a></p>
+                {% endif %}
             </div>
 
         </div>
