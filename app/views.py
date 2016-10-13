@@ -9,11 +9,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from pprint import pprint
+import datetime
 # Create your views here.
 
 def index(request, tag=None, sort=None):
-    print request.session
-    pprint(dir(request.session))
+    if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
+        return redirect(to='complete')
+
+    # print type(request.session['ttl'])
+    # pprint(dir(request.session))
     if tag:
         articles = Article.objects.filter(tag=tag)
     else:
@@ -38,6 +42,8 @@ def index(request, tag=None, sort=None):
     return render(request, 'l7h2.html', context)
 
 def detail(request, art_id, tag=None, error_form=None):
+    if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
+        return redirect(to='complete')
     context = {}
     article = Article.objects.get(id=art_id)
     if tag:
@@ -60,6 +66,8 @@ def detail(request, art_id, tag=None, error_form=None):
     return render(request, 'l8h2.html', context)
 
 def comment_post(request, art_id, tag=None):
+    if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
+        return redirect(to='complete')
     form = CommentForm(request.POST)
     if form.is_valid():
         name = form.cleaned_data['name']
@@ -80,9 +88,11 @@ def index_login(request):
             user = UserProfile.objects.get(belong_to=form.get_user())
             user.last_visit_dt = form.get_user().last_login
             user.save()
-            print form.get_user().last_login
-            print dir(form.get_user())
             login(request, form.get_user())
+            ttl = form.get_user().last_login + datetime.timedelta(minutes=5)
+            ttl = ttl.strftime('%Y-%m-%d %H:%M:%S')
+            request.session['ttl'] = ttl
+            # request.session['ttl'] = form.get_user().last_login.isoformat()
             return redirect(to='index', tag='', sort='')
     context['form'] = form
     return render(request, 'login.html', context)
@@ -100,9 +110,12 @@ def index_register(request):
     return render(request, 'login.html', context)
 
 def index_logout(request):
-    print (dir(request))
     logout(request)
     return redirect(to='login')
+
+def complete(request):
+    context = {}
+    return render(request, 'complete.html', context)
 
 def edge(obj):
     try:
@@ -110,3 +123,7 @@ def edge(obj):
     except AttributeError:
         obj = 0
     return obj
+
+def is_ttd(ttl):
+    if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > ttl:
+        return redirect(to='complete')

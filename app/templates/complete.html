@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>login</title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title">
+        <link rel="stylesheet" href="{% static 'login.css' %}" media="screen" title="no title">
+    </head>
+    <body>
+        <div class="ui basic segment container">
+            <div class="ui basic segment login">
+                <h2 class="ui center aligned icon header complete">
+                    <i class="user icon"></i>
+                    <div class="content">Opps!</div>
+                    <div class="sub header">We need you complete your user profile.</div>
+                </h2>
+                <div class="ui two buttons" style="margin-top: 30px">
+                    <button class="ui positive button">
+                          <a href="{% url 'login' %}" style="color: white">Done</a>
+                    </button>
+                    <button class="ui button">
+                        <a href="{% url 'index_logout' %}" style="color: black">Don't want to</a>
+                    </button>
+                </div>
+            </div>
+            <div class="ui basic segment logo">
+                <i class="icon inverted angle left"></i>
+                <div class="ui basic center aligned segment">
+                    <h4 class="ui inverted header">Welcome to</h4>
+                    <img src="{% static 'images/tenlogo.png' %}" alt="" />
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

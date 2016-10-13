@@ -16,7 +16,7 @@ body {
     position: absolute;
 }
 
-.ui.basic.segment.container > .ui.basic.inverted.segment.login {
+.ui.basic.segment.container > .ui.basic.segment.login {
     margin: 0;
     width: 400px;
     height: 400px;
@@ -43,4 +43,8 @@ body {
 
 .ui.form {
     padding-top: 30px;
+}
+
+.ui.center.aligned.icon.header.complete {
+    margin-top: 20%;
 }
