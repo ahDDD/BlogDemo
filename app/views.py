@@ -14,7 +14,8 @@ import datetime
 
 def index(request, tag=None, sort=None):
     if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
-        return redirect(to='complete')
+        if UserProfile.objects.get(belong_to=request.user).full_information is False:
+            return redirect(to='complete')
 
     # print type(request.session['ttl'])
     # pprint(dir(request.session))
@@ -43,7 +44,8 @@ def index(request, tag=None, sort=None):
 
 def detail(request, art_id, tag=None, error_form=None):
     if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
-        return redirect(to='complete')
+        if UserProfile.objects.get(belong_to=request.user).full_information is False:
+            return redirect(to='complete')
     context = {}
     article = Article.objects.get(id=art_id)
     if tag:
@@ -67,7 +69,8 @@ def detail(request, art_id, tag=None, error_form=None):
 
 def comment_post(request, art_id, tag=None):
     if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
-        return redirect(to='complete')
+        if UserProfile.objects.get(belong_to=request.user).full_information is False:
+            return redirect(to='complete')
     form = CommentForm(request.POST)
     if form.is_valid():
         name = form.cleaned_data['name']
