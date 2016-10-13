@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load range %}
+{% load yesno_tag %}
+{% load what_tag %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>blog</title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="{% static 'l7h2.css' %}" media="screen" title="no title">
+        <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
+    </head>
+    <body>
+        <div class="ui basic inverted vertical segment masthead">
+            <div class="ui inverted text menu">
+                {% if request.user.is_authenticated %}
+                    <div class="right menu">
+                        <div class="item">{{ request.user.username }}</div>
+                        <button class="ui inverted button item"><a href="{% url 'index_logout' %}">Logout</a></button>
+                    </div>
+                {% else %}
+                {% endif %}
+            </div>
+
+            <div class="ui basic center aligned segment">
+                <a href="{% url 'index' '' '' %}" class="logo">
+                    <h1 class="ui inverted header">Bloger</h1>
+                </a>
+                <p>
+                    {{ request.path }}
+                </p>
+                <p>
+                    Last Visit:  {{ user.last_visit_dt|date:"Y-m-d G:i" }}
+                </p>
+            </div>
+
+        </div>
+
+        <div class="ui basic segment menu">
+            <div class="ui borderless text menu">
+                <div class="ui dropdown item">
+                    Catalogues
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        {% if 'tech' in request.path %}
+                            <a class="active item" href="{% url 'index' 'tech' '' %}" >Tech</a>
+                        {% else %}
+                            <a class="item" href="{% url 'index' 'tech' '' %}" >Tech</a>
+                        {% endif %}
+
+                        {% if 'life' in request.path %}
+                            <a class="active item" href="{% url 'index' 'life' '' %}" >Life</a>
+                        {% else %}
+                            <a class="item" href="{% url 'index' 'life' '' %}" >Life</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <a href="{% url 'index' request.path|what_tag '/sort' %}" class="item">Popular</a>
+                <div class="item">
+                    About
+                </div>
+            </div>
+        </div>
+        <div class="ui basic segment content">
+            {% for article in articles %}
+                <a href="{% url 'comment' article.id request.path|yesno_tag:article.tag %}">
+                    <h2 class="ui header">{{ article.header }}</h2>
+                </a>
+
+                <p class="sub header">
+                    <i class="ui calendar icon"></i>{{ article.put_time }} |
+                    <i class="ui unhide icon"></i>{{ article.click_rate }}
+                </p>
+                <p>
+                    {{ article.content|truncatewords:20 }}
+                </p>
+                <a class="ui tag label" href="{% url 'index' article.tag '' %}">{{ article.tag }}</a>
+                <div class="ui divider"></div>
+            {% endfor %}
+            <div class="ui secondary menu">
+                {% if articles.has_previous %}
+                    <a href="?page=1" class="item"><i class="angle double left icon"></i></a>
+                    <a href="?page={{ articles.previous_page_number }}" class="item"><i class="angle left icon"></i></a>
+
+                {% else %}
+                    <a href="#" class="disabled item"><i class="disabled angle left icon"></i></a>
+
+                {% endif %}
+
+                {% for i in paginator.page_range|range:articles.number %}
+                    {% if articles.number == i %}
+                        <a href="?page={{ i }}" class="active item">{{ i }}</a>
+                    {% else %}
+                        <a href="?page={{ i }}" class="item">{{ i }}</a>
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if articles.has_next %}
+                    <a href="?page={{ articles.next_page_number }}" class="item"><i class="angle right icon"></i></a>
+                    <a href="?page={{ paginator.num_pages }}" class="item"><i class="angle double right icon"></i></a>
+
+                {% else %}
+                    <a href="#" class="disabled item"><i class="disabled angle right icon"></i></a>
+
+                {% endif %}
+            </div>
+
+        </div>
+        <div class="ui vertical very padded inverted segment">
+            Muggle Coding ®
+        </div>
+    <script type="text/javascript">$('.ui.dropdown').dropdown();</script>
+    </body>
+</html>

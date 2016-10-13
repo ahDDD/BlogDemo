@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load yesno_tag %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>details</title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title">
+        <link rel="stylesheet" href="{% static 'l8h2.css' %}" media="screen" title="no title">
+    </head>
+    <body>
+        <div class="ui basic segment container">
+            <div class="ui segment">
+                <h1 class="ui header">{{ article.header }}</h1>
+                <img src="/upload/{{ article.img }}" alt="">
+                <p>
+                    {{ article.content }}
+                </p>
+                <div class="ui text menu">
+                    {% if pre %}
+                        <a href="{% url 'comment' pre request.path|yesno_tag:article.tag %}" class="item">上一篇</a>
+                    {% else %}
+                        <a href="#" class="item">没有上一篇啦</a>
+                    {% endif %}
+
+                    {% if nex %}
+                        <a href="{% url 'comment' nex request.path|yesno_tag:article.tag %}" class="right item">下一篇</a>
+                    {% else %}
+                        <a href="#" class="item">没有下一篇啦</a>
+                    {% endif %}
+                    
+                </div>
+            </div>
+
+
+            <div class="ui segment comment">
+                <h3 class="ui header">Comments</h3>
+                {% for comment in article.comments.all %}
+                    <img class="ui left floated rounded image" src="{% static 'images/back.jpeg' %}" alt="" >
+                    <span class="ui header comment">{{ comment.name }}</span>
+                    <span class="sub header comment">2 days ago</span>
+
+                    <p>
+                        {{ comment.comment }}
+                    </p>
+                {% endfor %}
+
+                <div class="ui divider">
+
+                </div>
+{#                意为将每一个input用p包裹，则会有间隙#}
+                <form class="ui error tiny form" action="{% url 'comment_post' article.id request.path|yesno_tag:article.tag %}" method="post">
+                    {% if form.errors %}
+
+                        <div class="ui error message">
+                            {{ form.errors }}
+                        </div>
+                        {% for field in form %}
+                            <div class="{{ field.errors|yesno:'error ,' }}field">
+                                {{ field.label }}
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+
+                    {% else %}
+
+                        {% for field in form %}
+                            <div class="field">
+                                {{ field.label }}
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+
+                    {% endif %}
+
+                    {% csrf_token %}
+                    <button type="submit" name="button" class="ui blue button">Click</button>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

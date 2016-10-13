@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>login</title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title">
+        <link rel="stylesheet" href="{% static 'login.css' %}" media="screen" title="no title">
+    </head>
+    <body>
+        <div class="ui basic segment container">
+            <div class="ui basic inverted segment login">
+                {% if request.path == '/login' %}
+                    <a href="{% url 'register' %}">
+                        <h4 class="ui red right aligned header">or Register</h4>
+                    </a>
+                {% elif request.path == '/register' %}
+                    <a href="{% url 'login' %}">
+                        <h4 class="ui red right aligned header">or Login</h4>
+                    </a>
+                {% endif %}
+                <form class="ui error tiny form" method="post">
+                    {% if form.errors %}
+
+                        <div class="ui error message">
+                            {{ form.errors }}
+                        </div>
+                        {% for field in form %}
+                            <div class="{{ field.errors|yesno:'error ,' }}field">
+                                {{ field.label }}
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+
+                    {% else %}
+
+                        {% for field in form %}
+                            <div class="field">
+                                {{ field.label }}
+                                {{ field }}
+                            </div>
+                        {% endfor %}
+
+                    {% endif %}
+                    {% csrf_token %}
+                  <button class="ui right floated circular inverted red button" type="submit">Done</button>
+                </form>
+            </div>
+            <div class="ui basic segment logo">
+                <i class="icon inverted angle left"></i>
+                <div class="ui basic center aligned segment">
+                    <h4 class="ui inverted header">Welcome to</h4>
+                    <img src="{% static 'images/tenlogo.png' %}" alt="" />
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

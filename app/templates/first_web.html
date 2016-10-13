@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>first</title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title" charset="utf-8">
+    </head>
+    <body>
+        <div class="ui vertical segment">
+            <div class="ui image">
+                <img src="{% static 'images/banner.jpg' %}" alt="" />
+            </div>
+        </div>
+
+        <div class="ui vertical segment">
+            {% for article in articles %}
+            <div class="ui container segment ">
+                <a href="#" class="ui blue right ribbon label">life</a>
+                <h1 class="ui header">{{ article.header }}</h1>
+                <p>
+{#                    过滤器作用为截取前100个字符,防止过长#}
+                    {{ article.content|truncatechars:100 }}
+                    <a href="#">
+                        <i>READMORE</i>
+                    </a>
+                </p>
+                <button type="button" name="button" class="ui button inverted blue">read more</button>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="ui vertical inverted very padded segment">
+            Copyright d
+        </div>
+    </body>
+</html>
