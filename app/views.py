@@ -5,6 +5,7 @@ from app.forms import CommentForm, LoginForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template import Context, Template
 from django.db.models import ObjectDoesNotExist
+from django.utils.datastructures import MultiValueDictKeyError
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -49,11 +50,12 @@ def detail(request, art_id, tag=None, error_form=None):
             return redirect(to='complete')
     context = {}
     article = Article.objects.get(id=art_id)
-    user_profile = request.user.profile.id
+    user_profile = request.user.profile
+    context['collected'] = True if article in user_profile.collections.all() else False
+    context['got_it'] = Tikcet.objects.filter(article=article).filter(vote='like').count()
     try:
         ticket = Tikcet.objects.get(article=article, voter=user_profile)
         context['ticket'] = ticket
-        print ticket.vote
     except ObjectDoesNotExist:
         pass
     if tag:
@@ -78,13 +80,22 @@ def detail(request, art_id, tag=None, error_form=None):
 def detail_voter(request, art_id, tag=None, error_form=None):
     user_profile = request.user.profile
     article = Article.objects.get(id=art_id)
+    if request.POST.get('collect', False):
+        if article in user_profile.collections.all():
+            user_profile.collections.remove(article)
+        else:
+            user_profile.collections.add(article)
     try:
+        vote = request.POST['vote']
         ticket = Tikcet.objects.get(article=article, voter=user_profile)
-        ticket.vote = request.POST['vote']
+        ticket.vote = vote
         ticket.save()
     except ObjectDoesNotExist:
         new_ticket = Tikcet(voter_id=user_profile.id, article_id=art_id, vote=request.POST['vote'])
         new_ticket.save()
+    except MultiValueDictKeyError:
+        pass
+    
     return redirect(to='detail', art_id=art_id, tag=tag)
 
 def comment_post(request, art_id, tag=None, error_form=None):

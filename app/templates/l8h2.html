@@ -12,6 +12,11 @@
         <div class="ui basic segment container">
             <div class="ui segment">
                 <h1 class="ui header">{{ article.header }}</h1>
+                <p class="sub header">
+                    <i class="ui calendar icon"></i>{{ article.put_time }} |
+                    <i class="ui unhide icon"></i>{{ article.click_rate }} |
+                    <i class="ui checkmark box icon"></i>{{ got_it }} people got it
+                </p>
                 <img src="/upload/{{ article.img }}" alt="">
                 <p>
                     {{ article.content }}
@@ -30,27 +35,56 @@
                     {% endif %}
                     
                 </div>
-                <form class="ui huge buttons" action="{% url 'detail_voter' article.id request.path|yesno_tag:article.tag %}" method="post" >
+                <div class="ui divider"></div>
+                <form class="ui text menu buttons" action="{% url 'detail_voter' article.id request.path|yesno_tag:article.tag %}" method="post" >
                     {% csrf_token %}
                     {% if ticket.vote == 'like' %}
-                        <button class="ui  icon green button active" type="submit" name="vote" value="like">赞</button>
-                        <button class="ui  icon primary button " type="submit" name="vote" value="normal">阅</button>
-                        <button class="ui  icon grey button" type="submit" name="vote" value="dislike">踩</button>
-                    {% elif ticket.vote == 'normal' %}
-                        <button class="ui  icon green button" type="submit" name="vote" value="like">赞</button>
-                        <button class="ui  icon primary button active" type="submit" name="vote" value="normal">阅</button>
-                        <button class="ui  icon grey button" type="submit" name="vote" value="dislike">踩</button>
-                    {% elif ticket.vote == 'dislike' %}
-                        <button class="ui  icon green button" type="submit" name="vote" value="like">赞</button>
-                        <button class="ui  icon primary button" type="submit" name="vote" value="normal">阅</button>
-                        <button class="ui icon grey button active" type="submit" name="vote" value="dislike">踩</button>
+                    <div class="item">
+                        <button type="submit" name="vote" class="ui red button" value="like">
+                            <i class="ui checkmark icon"></i>Got it
+                        </button>
+                    </div>
                     {% else %}
-                        <button class="ui  icon green button" type="submit" name="vote" value="like">赞</button>
-                        <button class="ui  icon primary button" type="submit" name="vote" value="normal">阅</button>
-                        <button class="ui icon grey button" type="submit" name="vote" value="dislike">踩</button>
+                        <div class="item">
+                            <button type="submit" name="vote" class="ui grey button" value="like">
+                                <i class="ui checkmark icon"></i>Got it
+                            </button>
+                        </div>
                     {% endif %}
-                </form>
+                    {% if ticket.vote == 'normal' %}
+                    <div class="item">
+                        <button type="submit" name="vote" class="ui red button" value="normal">I see...</button>
+                    </div>
+                    {% else %}
+                        <div class="item">
+                            <button type="submit" name="vote" class="ui grey button" value="normal">I see...</button>
+                        </div>
+                    {% endif %}
+                    {% if ticket.vote == 'dislike' %}
+                        <div class="item">
+                            <button type="submit" name="vote" class="ui red button" value="dislike">Hmmmm</button>
+                        </div>
+                    {% else %}
+                        <div class="item">
+                            <button type="submit" name="vote" class="ui grey button" value="dislike">Hmmmm</button>
+                        </div>
+                    {% endif %}
 
+                    {% if collected %}
+                        <div class="right menu">
+                            <div class="item">
+                                <button type="submit" name="collect" value="T" class="ui primary circular button"><i class="ui download icon"></i>Saved</button>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="right menu">
+                            <div class="item">
+                                <button type="submit" name="collect" value="T" class="ui black circular button"><i class="ui download icon"></i>Saved</button>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </form>
             </div>
 
 
