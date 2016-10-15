@@ -32,3 +32,14 @@ body {
     top: 50%;
     transform: translate(0, 0);
 }
+
+.ui.huge.buttons {
+    margin-top: 30px;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ui.circular.icon.button > a {
+    color: white;
+}

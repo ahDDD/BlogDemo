@@ -13,6 +13,15 @@ class People(models.Model):
     def __str__(self):
         return self.name
 
+class UserProfile(models.Model):
+    belong_to = models.OneToOneField(to=User, related_name='profile')
+    profile_image = models.FileField(upload_to='profile_image', null=True, blank=True)
+    last_visit_dt = models.DateTimeField(null=True, blank=True)
+    full_information = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.belong_to)
+
 class Article(models.Model):
     id = models.AutoField(primary_key=True)
     header = models.CharField(null=True, blank=True, max_length=500)
@@ -25,6 +34,7 @@ class Article(models.Model):
     )
     tag = models.CharField(blank=True, max_length=5, choices=CHOICES)
     click_rate = models.PositiveIntegerField(default=0)
+    collector = models.ManyToManyField(to=UserProfile, related_name='collections')
 
     def __str__(self):
         return self.header
@@ -37,11 +47,19 @@ class Comment(models.Model):
     def __str__(self):
         return self.comment
 
-class UserProfile(models.Model):
-    belong_to = models.OneToOneField(to=User, related_name='profile')
-    profile_image = models.FileField(upload_to='profile_image', null=True, blank=True)
-    last_visit_dt = models.DateTimeField(null=True, blank=True)
-    full_information = models.BooleanField(default=False)
+class Tikcet(models.Model):
+    voter = models.ForeignKey(to=UserProfile, related_name='voted_tickets')
+    article = models.ForeignKey(to=Article, related_name='tickets')
+    CHOICES = (
+        ('like', 'Like'),
+        ('dislike', 'Dislike'),
+        ('normal', 'Normal'),
+    )
+    vote = models.CharField(choices=CHOICES, max_length=10)
+
+    def __str__(self):
+        return str(self.id)
+
 
 
 # CHOICES = (

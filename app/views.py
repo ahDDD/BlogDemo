@@ -1,9 +1,10 @@
 # coding=utf-8
 from django.shortcuts import render, HttpResponse, redirect, Http404
-from app.models import People, Article, Comment, UserProfile
+from app.models import People, Article, Comment, UserProfile, Tikcet
 from app.forms import CommentForm, LoginForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template import Context, Template
+from django.db.models import ObjectDoesNotExist
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -48,6 +49,13 @@ def detail(request, art_id, tag=None, error_form=None):
             return redirect(to='complete')
     context = {}
     article = Article.objects.get(id=art_id)
+    user_profile = request.user.profile.id
+    try:
+        ticket = Tikcet.objects.get(article=article, voter=user_profile)
+        context['ticket'] = ticket
+        print ticket.vote
+    except ObjectDoesNotExist:
+        pass
     if tag:
         pre = Article.objects.filter(tag=tag).filter(id__lt=art_id).order_by('-id').first()
         nex = Article.objects.filter(tag=tag).filter(id__gt=art_id).order_by('id').first()
@@ -67,7 +75,19 @@ def detail(request, art_id, tag=None, error_form=None):
     context['article'] = article
     return render(request, 'l8h2.html', context)
 
-def comment_post(request, art_id, tag=None):
+def detail_voter(request, art_id, tag=None, error_form=None):
+    user_profile = request.user.profile
+    article = Article.objects.get(id=art_id)
+    try:
+        ticket = Tikcet.objects.get(article=article, voter=user_profile)
+        ticket.vote = request.POST['vote']
+        ticket.save()
+    except ObjectDoesNotExist:
+        new_ticket = Tikcet(voter_id=user_profile.id, article_id=art_id, vote=request.POST['vote'])
+        new_ticket.save()
+    return redirect(to='detail', art_id=art_id, tag=tag)
+
+def comment_post(request, art_id, tag=None, error_form=None):
     if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
         if UserProfile.objects.get(belong_to=request.user).full_information is False:
             return redirect(to='complete')

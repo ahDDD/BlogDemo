@@ -18,18 +18,39 @@
                 </p>
                 <div class="ui text menu">
                     {% if pre %}
-                        <a href="{% url 'comment' pre request.path|yesno_tag:article.tag %}" class="item">上一篇</a>
+                        <a href="{% url 'detail' pre request.path|yesno_tag:article.tag %}" class="item">上一篇</a>
                     {% else %}
                         <a href="#" class="item">没有上一篇啦</a>
                     {% endif %}
 
                     {% if nex %}
-                        <a href="{% url 'comment' nex request.path|yesno_tag:article.tag %}" class="right item">下一篇</a>
+                        <a href="{% url 'detail' nex request.path|yesno_tag:article.tag %}" class="right item">下一篇</a>
                     {% else %}
                         <a href="#" class="item">没有下一篇啦</a>
                     {% endif %}
                     
                 </div>
+                <form class="ui huge buttons" action="{% url 'detail_voter' article.id request.path|yesno_tag:article.tag %}" method="post" >
+                    {% csrf_token %}
+                    {% if ticket.vote == 'like' %}
+                        <button class="ui  icon green button active" type="submit" name="vote" value="like">赞</button>
+                        <button class="ui  icon primary button " type="submit" name="vote" value="normal">阅</button>
+                        <button class="ui  icon grey button" type="submit" name="vote" value="dislike">踩</button>
+                    {% elif ticket.vote == 'normal' %}
+                        <button class="ui  icon green button" type="submit" name="vote" value="like">赞</button>
+                        <button class="ui  icon primary button active" type="submit" name="vote" value="normal">阅</button>
+                        <button class="ui  icon grey button" type="submit" name="vote" value="dislike">踩</button>
+                    {% elif ticket.vote == 'dislike' %}
+                        <button class="ui  icon green button" type="submit" name="vote" value="like">赞</button>
+                        <button class="ui  icon primary button" type="submit" name="vote" value="normal">阅</button>
+                        <button class="ui icon grey button active" type="submit" name="vote" value="dislike">踩</button>
+                    {% else %}
+                        <button class="ui  icon green button" type="submit" name="vote" value="like">赞</button>
+                        <button class="ui  icon primary button" type="submit" name="vote" value="normal">阅</button>
+                        <button class="ui icon grey button" type="submit" name="vote" value="dislike">踩</button>
+                    {% endif %}
+                </form>
+
             </div>
 
 

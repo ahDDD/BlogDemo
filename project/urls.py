@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from app.views import index, detail, comment_post, index_login, index_register, index_logout, complete
+from app.views import index, detail, comment_post, index_login, index_register, index_logout, complete, detail_voter
 from django.contrib.auth.views import logout
 
 from django.conf import settings
@@ -24,8 +24,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^index/(?P<tag>\w*)(?P<sort>/*\w*)$', index, name='index'),
-    url(r'^detail/(?P<art_id>\d+)/(?P<tag>\w*)$', detail, name='comment'),
-    url(r'^comment/(?P<art_id>\d+)(?P<tag>/*\w*)/post$', comment_post, name='comment_post'),
+    url(r'^detail/vote/(?P<art_id>\d+)/(?P<tag>\w*)/$', detail_voter, name='detail_voter'),
+    url(r'^comment/(?P<art_id>\d+)/post/(?P<tag>\w*)$', comment_post, name='comment_post'),
+    url(r'^detail/(?P<art_id>\d+)/(?P<tag>\w*)$', detail, name='detail'),
     url(r'^login$', index_login, name='login'),
     url(r'^register$', index_register, name='register'),
     url(r'^logout$', logout, {'next_page': '/login'}, name='logout'),
