@@ -36,6 +36,8 @@
                     
                 </div>
                 <div class="ui divider"></div>
+
+                <img class="ui avatar image" src="/upload/{{ request.user.profile.profile_image }}"> {{ request.user }}
                 <form class="ui text menu buttons" action="{% url 'detail_voter' article.id request.path|yesno_tag:article.tag %}" method="post" >
                     {% csrf_token %}
                     {% if ticket.vote == 'like' %}

@@ -51,6 +51,7 @@ def detail(request, art_id, tag=None, error_form=None):
     context = {}
     article = Article.objects.get(id=art_id)
     user_profile = request.user.profile
+    context['collector'] = article.collector.all()
     context['collected'] = True if article in user_profile.collections.all() else False
     context['got_it'] = Tikcet.objects.filter(article=article).filter(vote='like').count()
     try:
@@ -95,7 +96,7 @@ def detail_voter(request, art_id, tag=None, error_form=None):
         new_ticket.save()
     except MultiValueDictKeyError:
         pass
-    
+
     return redirect(to='detail', art_id=art_id, tag=tag)
 
 def comment_post(request, art_id, tag=None, error_form=None):
@@ -123,10 +124,9 @@ def index_login(request):
             user.last_visit_dt = form.get_user().last_login
             user.save()
             login(request, form.get_user())
-            ttl = form.get_user().last_login + datetime.timedelta(minutes=5)
-            ttl = ttl.strftime('%Y-%m-%d %H:%M:%S')
-            request.session['ttl'] = ttl
+
             # request.session['ttl'] = form.get_user().last_login.isoformat()
+            print 'view is on'
             return redirect(to='index', tag='', sort='')
     context['form'] = form
     return render(request, 'login.html', context)
