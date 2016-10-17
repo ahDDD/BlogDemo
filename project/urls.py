@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from app.views import index, detail, comment_post, index_login, index_register, index_logout, complete, detail_voter
+from app.views import index, detail, comment_post, index_login, index_register, index_logout, complete, detail_voter, \
+    profile, profile_post, pwd_post, my
 from django.contrib.auth.views import logout
 
 from django.conf import settings
@@ -32,6 +33,10 @@ urlpatterns = [
     url(r'^logout$', logout, {'next_page': '/login'}, name='logout'),
     url(r'^logout$', index_logout, name='index_logout'),
     url(r'^complete$', complete, name='complete'),
+    url(r'^profile/profile_change/$', profile_post, name='profile_post'),
+    url(r'^profile/pwd_change/$', pwd_post, name='pwd_post'),
+    url(r'^profile/$', profile, name='profile'),
+    url(r'^my/$', my, name='my'),
 ]
 
 if settings.DEBUG:

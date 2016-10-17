@@ -1,0 +1,76 @@
+{% extends 'l7h2.html' %}
+{% load staticfiles %}
+{% load what_tab %}
+
+{% block title %}
+    profile
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'profile.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="ui basic segment content">
+        <div class="ui tabular menu">
+            <div class="item{{ tab|what_tab:'tab1' }}" data-tab="tab1">基本资料</div>
+            <div class="item{{ tab|what_tab:'tab2' }}" data-tab="tab2">修改密码</div>
+        </div>
+        <div class="ui tab{{ tab|what_tab:'tab1' }}" data-tab="tab1">
+            <form action="{% url 'profile_post' %}" method="post" class="ui form">
+                {% csrf_token %}
+                {% if profile_form.errors %}
+
+                    <div class="ui error message">
+                        {{ profile_form.errors }}
+                    </div>
+                    {% for field in profile_form %}
+                        <div class="{{ field.errors|yesno:'error ,' }}field">
+                            {{ field.label }}
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+
+                {% else %}
+
+                    {% for field in profile_form %}
+                        <div class="field">
+                            <label>{{ field.label }}</label>
+
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+
+                {% endif %}
+                <button type="submit" name="button" class="ui blue button">保存</button>
+            </form>
+        </div>
+        <div class="ui tab{{ tab|what_tab:'tab2' }}" data-tab="tab2">
+            <form action="{% url 'pwd_post' %}" method="post" class="ui error form">
+                {% csrf_token %}
+                {% if pwd_form.errors %}
+                    <div class="ui error message">
+                        {{ pwd_form.errors }}
+                    </div>
+                    {% for field in pwd_form %}
+                        <div class="{{ field.errors|yesno:'error ,' }}field">
+                            {{ field.label }}
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+
+                {% else %}
+                    {% for field in pwd_form %}
+                        <div class="field">
+                            <label>{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+
+                {% endif %}
+                <button type="submit" name="button" class="ui blue button">保存</button>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">$('.tabular.menu .item').tab();</script>
+{% endblock %}

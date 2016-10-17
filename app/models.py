@@ -15,6 +15,12 @@ class People(models.Model):
 
 class UserProfile(models.Model):
     belong_to = models.OneToOneField(to=User, related_name='profile')
+    CHOICES = (
+        ('female', '女'),
+        ('male', '男'),
+        ('secret', '保密'),
+    )
+    sex = models.CharField(choices=CHOICES, max_length=10, null=True)
     profile_image = models.FileField(upload_to='profile_image', null=True, blank=True)
     last_visit_dt = models.DateTimeField(null=True, blank=True)
     full_information = models.BooleanField(default=False)

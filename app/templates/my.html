@@ -1,0 +1,27 @@
+{% extends 'l7h2.html' %}
+{% load staticfiles %}
+{% block title %}
+    我的
+{% endblock %}
+
+{% block content %}
+    <div class="ui basic segment content">
+        <h1>我的</h1>
+        <div class="ui divider"></div>
+
+        <div class="ui tabular menu">
+            <div class="item active" data-tab="tab1">收藏</div>
+        </div>
+        <div class="ui tab active" data-tab="tab1">
+            {% for article in articles %}
+                <a href="{% url 'detail' article.id '' %}">
+                    <h2 class="ui header">{{ article.header }}</h2>
+                </a>
+                <p class="sub header">
+                    <i class="ui calendar icon"></i>{{ article.put_time }} |
+                    <i class="ui unhide icon"></i>{{ article.click_rate }}
+                </p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

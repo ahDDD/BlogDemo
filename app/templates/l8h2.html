@@ -1,139 +1,137 @@
-<!DOCTYPE html>
+{% extends 'l7h2.html' %}
 {% load staticfiles %}
 {% load yesno_tag %}
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>details</title>
-        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title">
-        <link rel="stylesheet" href="{% static 'l8h2.css' %}" media="screen" title="no title">
-    </head>
-    <body>
-        <div class="ui basic segment container">
-            <div class="ui segment">
-                <h1 class="ui header">{{ article.header }}</h1>
-                <p class="sub header">
-                    <i class="ui calendar icon"></i>{{ article.put_time }} |
-                    <i class="ui unhide icon"></i>{{ article.click_rate }} |
-                    <i class="ui checkmark box icon"></i>{{ got_it }} people got it
-                </p>
-                <img src="/upload/{{ article.img }}" alt="">
-                <p>
-                    {{ article.content }}
-                </p>
-                <div class="ui text menu">
-                    {% if pre %}
-                        <a href="{% url 'detail' pre request.path|yesno_tag:article.tag %}" class="item">上一篇</a>
-                    {% else %}
-                        <a href="#" class="item">没有上一篇啦</a>
-                    {% endif %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'l8h2.css' %}">
+{% endblock %}
+{% block content %}
+<div class="ui basic segment content">
+    <div class="article">
+        <h1 class="ui header">{{ article.header }}</h1>
+        <p class="sub header">
+            <i class="ui calendar icon"></i>{{ article.put_time }} |
+            <i class="ui unhide icon"></i>{{ article.click_rate }} |
+            <i class="ui checkmark box icon"></i>{{ got_it }} people got it
+        </p>
+        <img src="/upload/{{ article.img }}" alt="">
+        <p>
+            {{ article.content }}
+        </p>
+        <div class="ui text menu">
+            {% if pre %}
+                <a href="{% url 'detail' pre request.path|yesno_tag:article.tag %}" class="item">上一篇</a>
+            {% else %}
+                <a href="#" class="item">没有上一篇啦</a>
+            {% endif %}
 
-                    {% if nex %}
-                        <a href="{% url 'detail' nex request.path|yesno_tag:article.tag %}" class="right item">下一篇</a>
-                    {% else %}
-                        <a href="#" class="item">没有下一篇啦</a>
-                    {% endif %}
-                    
-                </div>
-                <div class="ui divider"></div>
+            {% if nex %}
+                <a href="{% url 'detail' nex request.path|yesno_tag:article.tag %}" class="right item">下一篇</a>
+            {% else %}
+                <a href="#" class="item">没有下一篇啦</a>
+            {% endif %}
 
-                <img class="ui avatar image" src="/upload/{{ request.user.profile.profile_image }}"> {{ request.user }}
-                <form class="ui text menu buttons" action="{% url 'detail_voter' article.id request.path|yesno_tag:article.tag %}" method="post" >
-                    {% csrf_token %}
-                    {% if ticket.vote == 'like' %}
-                    <div class="item">
-                        <button type="submit" name="vote" class="ui red button" value="like">
-                            <i class="ui checkmark icon"></i>Got it
-                        </button>
-                    </div>
-                    {% else %}
-                        <div class="item">
-                            <button type="submit" name="vote" class="ui grey button" value="like">
-                                <i class="ui checkmark icon"></i>Got it
-                            </button>
-                        </div>
-                    {% endif %}
-                    {% if ticket.vote == 'normal' %}
-                    <div class="item">
-                        <button type="submit" name="vote" class="ui red button" value="normal">I see...</button>
-                    </div>
-                    {% else %}
-                        <div class="item">
-                            <button type="submit" name="vote" class="ui grey button" value="normal">I see...</button>
-                        </div>
-                    {% endif %}
-                    {% if ticket.vote == 'dislike' %}
-                        <div class="item">
-                            <button type="submit" name="vote" class="ui red button" value="dislike">Hmmmm</button>
-                        </div>
-                    {% else %}
-                        <div class="item">
-                            <button type="submit" name="vote" class="ui grey button" value="dislike">Hmmmm</button>
-                        </div>
-                    {% endif %}
+        </div>
+        <div class="ui divider"></div>
 
-                    {% if collected %}
-                        <div class="right menu">
-                            <div class="item">
-                                <button type="submit" name="collect" value="T" class="ui primary circular button"><i class="ui download icon"></i>Saved</button>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="right menu">
-                            <div class="item">
-                                <button type="submit" name="collect" value="T" class="ui black circular button"><i class="ui download icon"></i>Saved</button>
-                            </div>
-                        </div>
-                    {% endif %}
+        {% if collector %}
+            {% for i in collector %}
+                <img class="ui avatar image" src="/upload/{{ i.profile_image }}"> {{ i }}
+            {% endfor %}
+        {% endif %}
 
-                </form>
+
+        <form class="ui text menu" action="{% url 'detail_voter' article.id request.path|yesno_tag:article.tag %}" method="post" >
+            {% csrf_token %}
+            {% if ticket.vote == 'like' %}
+            <div class="item">
+                <button type="submit" name="vote" class="ui red button" value="like">
+                    <i class="ui checkmark icon"></i>Got it
+                </button>
             </div>
+            {% else %}
+                <div class="item">
+                    <button type="submit" name="vote" class="ui grey button" value="like">
+                        <i class="ui checkmark icon"></i>Got it
+                    </button>
+                </div>
+            {% endif %}
+            {% if ticket.vote == 'normal' %}
+            <div class="item">
+                <button type="submit" name="vote" class="ui red button" value="normal">I see...</button>
+            </div>
+            {% else %}
+                <div class="item">
+                    <button type="submit" name="vote" class="ui grey button" value="normal">I see...</button>
+                </div>
+            {% endif %}
+            {% if ticket.vote == 'dislike' %}
+                <div class="item">
+                    <button type="submit" name="vote" class="ui red button" value="dislike">Hmmmm</button>
+                </div>
+            {% else %}
+                <div class="item">
+                    <button type="submit" name="vote" class="ui grey button" value="dislike">Hmmmm</button>
+                </div>
+            {% endif %}
 
+            {% if collected %}
+                <div class="right menu">
+                    <div class="item">
+                        <button type="submit" name="collect" value="T" class="ui primary circular button"><i class="ui download icon"></i>Saved</button>
+                    </div>
+                </div>
+            {% else %}
+                <div class="right menu">
+                    <div class="item">
+                        <button type="submit" name="collect" value="T" class="ui black circular button"><i class="ui download icon"></i>Saved</button>
+                    </div>
+                </div>
+            {% endif %}
 
-            <div class="ui segment comment">
-                <h3 class="ui header">Comments</h3>
-                {% for comment in article.comments.all %}
-                    <img class="ui left floated rounded image" src="{% static 'images/back.jpeg' %}" alt="" >
-                    <span class="ui header comment">{{ comment.name }}</span>
-                    <span class="sub header comment">2 days ago</span>
+        </form>
 
-                    <p>
-                        {{ comment.comment }}
-                    </p>
+        <h4 class="ui horizontal divider header">COMMENT</h4>
+
+        {% for comment in article.comments.all %}
+            <img class="ui left floated rounded image" src="{% static 'images/back.jpeg' %}" alt="" >
+            <span class="ui header comment">{{ comment.name }}</span>
+            <span class="sub header comment">2 days ago</span>
+
+            <p>
+                {{ comment.comment }}
+            </p>
+        {% endfor %}
+
+        <div class="ui divider">
+
+        </div>
+        <form class="ui error tiny form" action="{% url 'comment_post' article.id request.path|yesno_tag:article.tag %}" method="post">
+            {% if form.errors %}
+
+                <div class="ui error message">
+                    {{ form.errors }}
+                </div>
+                {% for field in form %}
+                    <div class="{{ field.errors|yesno:'error ,' }}field">
+                        {{ field.label }}
+                        {{ field }}
+                    </div>
                 {% endfor %}
 
-                <div class="ui divider">
+            {% else %}
 
-                </div>
-{#                意为将每一个input用p包裹，则会有间隙#}
-                <form class="ui error tiny form" action="{% url 'comment_post' article.id request.path|yesno_tag:article.tag %}" method="post">
-                    {% if form.errors %}
+                {% for field in form %}
+                    <div class="field">
+                        {{ field.label }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
 
-                        <div class="ui error message">
-                            {{ form.errors }}
-                        </div>
-                        {% for field in form %}
-                            <div class="{{ field.errors|yesno:'error ,' }}field">
-                                {{ field.label }}
-                                {{ field }}
-                            </div>
-                        {% endfor %}
+            {% endif %}
 
-                    {% else %}
-
-                        {% for field in form %}
-                            <div class="field">
-                                {{ field.label }}
-                                {{ field }}
-                            </div>
-                        {% endfor %}
-
-                    {% endif %}
-
-                    {% csrf_token %}
-                    <button type="submit" name="button" class="ui blue button">Click</button>
-                </form>
-            </div>
+            {% csrf_token %}
+            <button type="submit" name="button" class="ui blue button">Click</button>
+        </form>
+    </div>
         </div>
-    </body>
-</html>
+{% endblock %}

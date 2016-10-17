@@ -1,7 +1,7 @@
 # coding=utf-8
 from django.shortcuts import render, HttpResponse, redirect, Http404
 from app.models import People, Article, Comment, UserProfile, Tikcet
-from app.forms import CommentForm, LoginForm
+from app.forms import CommentForm, LoginForm, UserProfileForm, PasswordForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template import Context, Template
 from django.db.models import ObjectDoesNotExist
@@ -10,14 +10,14 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
+from django.core.exceptions import ValidationError
+from django.forms.utils import ErrorList
+
 from pprint import pprint
 import datetime
 # Create your views here.
 
 def index(request, tag=None, sort=None):
-    if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
-        if UserProfile.objects.get(belong_to=request.user).full_information is False:
-            return redirect(to='complete')
 
     # print type(request.session['ttl'])
     # pprint(dir(request.session))
@@ -150,6 +150,56 @@ def index_logout(request):
 def complete(request):
     context = {}
     return render(request, 'complete.html', context)
+
+def profile(request, error_up_form=None, error_pwd_form=None):
+    context = {}
+    if error_up_form:
+        context['profile_form'] = error_up_form
+    else:
+        context['profile_form'] = UserProfileForm
+    if error_pwd_form:
+        print 'here'
+        print  error_pwd_form.errors
+        context['pwd_form'] = error_pwd_form
+    else:
+        context['pwd_form'] = PasswordForm
+    context['tab'] = request.session.get('tab')
+    return render(request, 'profile.html', context)
+
+def profile_post(request):
+    request.session['tab'] = 'tab1'
+    profile = request.user.profile
+    form = UserProfileForm(request.POST, instance=profile)
+    if form.is_valid():
+        user_profile = form.save()
+        user_profile.save()
+    return redirect(to='profile')
+
+def pwd_post(request):
+    request.session['tab'] = 'tab2'
+    form = PasswordForm(request.POST)
+    print request.POST.get('oldpassword', '')
+    print request.user
+    print form.is_valid()
+    if form.is_valid():
+        oldpassword = request.POST.get('oldpassword', '')
+        print request.user.check_password(oldpassword)
+        if request.user.check_password(oldpassword):
+            newpassword = request.POST.get('newpassword1', '')
+            request.user.set_password(newpassword)
+            request.user.save()
+        else:
+            form.errors['oldpassword'] = ErrorList([u'原密码不正确啊'])
+            return profile(request, error_pwd_form=form)
+    else:
+        return profile(request, error_pwd_form=form)
+    return redirect(to='profile')
+
+def my(request):
+    context = {}
+    context['articles'] = request.user.profile.collections.all()
+    return render(request, 'my.html', context)
+
 
 def edge(obj):
     try:

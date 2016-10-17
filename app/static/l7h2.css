@@ -1,33 +1,3 @@
-.logo > .ui.header {
-    font-size: 50px;
-}
-
-.ui.basic.inverted.vertical.segment.masthead {
-    height: 300px;
-    background: url("images/star_banner.jpg");
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    padding-right: 40px;
-}
-
-.ui.basic.inverted.vertical.segment.masthead > img {
-    height: 100%;
-    width: 100%;
-    object-fit: fill;
-}
-
-.ui.basic.inverted.vertical.segment.masthead > .ui.basic.center.aligned.segment {
-    position: absolute;
-    color: rgb(255, 255, 255);
-    left: 50%;
-    top: 40%;
-    transform: translate(-50%, -50%);
-}
-
-.ui.basic.center.aligned.segment > .ui.inverted.header {
-    margin: 0;
-    font-size: 60px;
-}
 
 .ui.basic.segment.menu {
     border-bottom: solid 1px;
@@ -50,12 +20,6 @@
     margin-right: 30px;
 }
 
-.ui.basic.segment.content {
-    width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .ui.basic.segment > .ui.header {
     margin-bottom: 0;
 }
@@ -63,4 +27,8 @@
 .ui.basic.segment > .sub.header {
     margin-bottom: 0;
     color: rgb(140, 140, 140);
+}
+
+.ui.inverted.menu .item > a {
+    color: black;
 }

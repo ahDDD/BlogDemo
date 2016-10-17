@@ -3,6 +3,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib.auth.models import User
 from app.models import UserProfile
+from django.shortcuts import redirect
 
 import datetime
 
@@ -24,5 +25,9 @@ class ToolMiddleware(MiddlewareMixin):
         except MultiValueDictKeyError:
             pass
 
+        if request.user.is_authenticated:
+            if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > request.session['ttl']:
+                if UserProfile.objects.get(belong_to=request.user).full_information is False:
+                    return redirect(to='complete')
 
         return response

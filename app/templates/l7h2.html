@@ -6,42 +6,59 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>blog</title>
+        <title>
+            {% block title %}
+                blog
+            {% endblock %}
+        </title>
+        {% block css %}
+            <link rel="stylesheet" href="{% static 'l7h2.css' %}" media="screen" title="no title">
+        {% endblock %}
         <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title" charset="utf-8">
-        <link rel="stylesheet" href="{% static 'l7h2.css' %}" media="screen" title="no title">
+        <link rel="stylesheet" href="{% static 'base.css' %}" media="screen" title="no title">
         <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
     </head>
     <body>
-        <div class="ui basic inverted vertical segment masthead">
-            <div class="ui inverted text menu">
-                {% if request.user.is_authenticated %}
-                    <div class="right menu">
-                        <div class="item">{{ request.user.username }}</div>
-                        <button class="ui inverted button item"><a href="{% url 'index_logout' %}">Logout</a></button>
+        <div class="ui basic vertical inverted red segment masthead">
+            <div class="ui text menu masthead">
+                <div class="ui image masthead">
+                    <a href="{% url 'index' '' '' %}"><img src="{% static 'images/tenlogo.png' %}" alt="" /></a>
+                </div>
+                <div class="right menu">
+                    {% if request.user.is_authenticated %}
+                    <div class="item">
+                        <div class="ui dropdown right item">
+                            {{ request.user.username }}
+                            <i class="dropdown icon"></i>
+                            <div class="menu">
+                                <a href="{% url 'my' %}" class="ui button item">我的</a>
+                                <button class="ui button item">
+                                    <a href="{% url 'profile' %}">Profile</a>
+                                </button>
+                                <button class="ui button item">
+                                    <a href="{% url 'index_logout' %}">Logout</a>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                {% else %}
-                {% endif %}
-            </div>
-
-            <div class="ui basic center aligned segment">
-                <a href="{% url 'index' '' '' %}" class="logo">
-                    <h1 class="ui inverted header">Bloger</h1>
-                </a>
-                <p>
-                    {{ request.path }}
-                </p>
-                {% if request.user.is_authenticated %}
-                <p>
-                    Last Visit:  {{ user.last_visit_dt|date:"Y-m-d G:i" }}
-                </p>
+                    <div class="item">
+                        <a href="{% url 'index_logout' %}" class="ui inverted circular button">Logout</a>
+                    </div>
                     {% else %}
-                    <p>你还没有登录, <a href="{% url 'login' %}">点击登录</a></p>
-                {% endif %}
-            </div>
+                        <div class="ui item">
+                            <p>你还没有登录, <a href="{% url 'login' %}">点击登录</a></p>
+                        </div>
+                    {% endif %}
 
+
+                </div>
+            </div>
         </div>
 
+        <div class="ui vertical basic segment banner"></div>
+
+        {% block content %}
         <div class="ui basic segment menu">
             <div class="ui borderless text menu">
                 <div class="ui dropdown item">
@@ -68,6 +85,12 @@
             </div>
         </div>
         <div class="ui basic segment content">
+            {% if request.user.is_authenticated %}
+                <p>
+                    Last Visit:  {{ user.last_visit_dt|date:"Y-m-d G:i" }}
+                </p>
+            {% else %}
+            {% endif %}
             {% for article in articles %}
                 <a href="{% url 'detail' article.id request.path|yesno_tag:article.tag %}">
                     <h2 class="ui header">{{ article.header }}</h2>
@@ -114,6 +137,7 @@
             </div>
 
         </div>
+        {% endblock %}
         <div class="ui vertical very padded inverted segment">
             Muggle Coding ®
         </div>
