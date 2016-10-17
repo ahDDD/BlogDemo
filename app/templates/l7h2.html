@@ -86,8 +86,8 @@
         </div>
         <div class="ui basic segment content">
             {% if request.user.is_authenticated %}
-                <p>
-                    Last Visit:  {{ user.last_visit_dt|date:"Y-m-d G:i" }}
+                <p style="color: grey">
+                    <i class="info circle icon"></i>Last Visit:  {{ user.last_visit_dt|date:"Y-m-d G:i" }}
                 </p>
             {% else %}
             {% endif %}

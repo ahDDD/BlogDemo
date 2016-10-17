@@ -68,18 +68,10 @@ class Tikcet(models.Model):
 
 
 
-# CHOICES = (
-#         'tech',
-#         'life',
-#     )
-#
-# import random
-# fake = Factory.create()
-# for _ in range(100):
-#     a = Article(
-#         header=fake.text(max_nb_chars=50),
-#         content=fake.text(max_nb_chars=3000),
-#         tag=random.choice(CHOICES),
-#         click_rate=int(random.uniform(1, 9999)),
-#     )
+import random
+# users = User.objects.all()
+# a = Article.objects.get(id=2)
+# for user in range(len(users)):
+#     profile = UserProfile.objects.get_or_create(belong_to=user)
+#     profile.collections.add(a)
 #     a.save()
