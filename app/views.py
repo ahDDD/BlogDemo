@@ -1,5 +1,5 @@
 # coding=utf-8
-from django.shortcuts import render, HttpResponse, redirect, Http404
+from django.shortcuts import render, redirect, Http404
 from app.models import People, Article, Comment, UserProfile, Tikcet
 from app.forms import CommentForm, LoginForm, UserProfileForm, PasswordForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -13,8 +13,17 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 
+from django.contrib.auth.decorators import login_required
+
 from pprint import pprint
 import datetime
+
+# RsST
+from django.shortcuts import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+from app.serializers import ArticleModelSerializer
 # Create your views here.
 
 def index(request, tag=None, sort=None):
@@ -81,6 +90,7 @@ def detail(request, art_id, tag=None, error_form=None):
 def detail_voter(request, art_id, tag=None, error_form=None):
     user_profile = request.user.profile
     article = Article.objects.get(id=art_id)
+
     if request.POST.get('collect', False):
         if article in user_profile.collections.all():
             user_profile.collections.remove(article)
@@ -151,6 +161,7 @@ def complete(request):
     context = {}
     return render(request, 'complete.html', context)
 
+@login_required
 def profile(request, error_up_form=None, error_pwd_form=None):
     context = {}
     if error_up_form:
@@ -211,3 +222,34 @@ def edge(obj):
 def is_ttd(ttl):
     if datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') > ttl:
         return redirect(to='complete')
+
+
+# ReST
+class JSONResponse(HttpResponse):
+    """
+    一个将content装换为JSON的HttpResponse
+    """
+    def __init__(self, data, **kwargs):
+        content = JSONRenderer().render(data)
+        kwargs['content_type'] = 'application/json'
+        super(JSONResponse, self).__init__(content, **kwargs)
+
+
+def article_list(request):
+    """
+    默认在GET情况下
+    """
+    articles = Article.objects.all()
+    serializer = ArticleModelSerializer(articles, many=True)
+    return JSONResponse(serializer.data)
+
+
+def article_detail(request, pk):
+    try:
+        article = Article.objects.get(pk=pk)
+    except Article.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = ArticleModelSerializer(article)
+        return JSONResponse(serializer.data)

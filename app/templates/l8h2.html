@@ -64,6 +64,8 @@
                     <a id="click">查看更多</a>
                 {% endif %}
             </div>
+        {% else %}
+            <p>目前还没有人收藏</p>
         {% endif %}
 
 
@@ -110,7 +112,7 @@
             {% else %}
                 <div class="right menu">
                     <div class="item">
-                        <button type="submit" name="collect" value="T" class="ui black circular button"><i class="ui download icon"></i>Saved</button>
+                        <button type="submit" name="collect" value="F" class="ui black circular button"><i class="ui download icon"></i>Saved</button>
                     </div>
                 </div>
             {% endif %}

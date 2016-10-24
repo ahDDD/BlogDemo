@@ -22,6 +22,9 @@ from django.contrib.auth.views import logout
 from django.conf import settings
 from django.conf.urls.static import static
 
+# ReST
+from django.conf.urls import include
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^index/(?P<tag>\w*)(?P<sort>/*\w*)$', index, name='index'),
@@ -37,6 +40,8 @@ urlpatterns = [
     url(r'^profile/pwd_change/$', pwd_post, name='pwd_post'),
     url(r'^profile/$', profile, name='profile'),
     url(r'^my/$', my, name='my'),
+    url(r'^', include('app.urls')),
+
 ]
 
 if settings.DEBUG:
