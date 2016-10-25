@@ -19,11 +19,14 @@ from pprint import pprint
 import datetime
 
 # RsST
-from django.shortcuts import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
 from app.serializers import ArticleModelSerializer
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.http import Http404
+from rest_framework.views import APIView
+from rest_framework import generics
 # Create your views here.
 
 def index(request, tag=None, sort=None):
@@ -225,31 +228,52 @@ def is_ttd(ttl):
 
 
 # ReST
-class JSONResponse(HttpResponse):
-    """
-    一个将content装换为JSON的HttpResponse
-    """
-    def __init__(self, data, **kwargs):
-        content = JSONRenderer().render(data)
-        kwargs['content_type'] = 'application/json'
-        super(JSONResponse, self).__init__(content, **kwargs)
 
-
+@api_view(['GET'])
 def article_list(request):
     """
     默认在GET情况下
     """
     articles = Article.objects.all()
     serializer = ArticleModelSerializer(articles, many=True)
-    return JSONResponse(serializer.data)
+    return Response(serializer.data)
 
-
+@api_view(['GET'])
 def article_detail(request, pk):
     try:
         article = Article.objects.get(pk=pk)
     except Article.DoesNotExist:
-        return HttpResponse(status=404)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = ArticleModelSerializer(article)
-        return JSONResponse(serializer.data)
+        return Response(serializer.data)
+
+
+class ArticleList(APIView):
+
+    def get(self, request):
+        articles = Article.objects.all()
+        serializer = ArticleModelSerializer(articles, many=True)
+        return Response(serializer.data)
+
+class ArticleDetail(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Article.objects.get(pk=pk)
+        except Article.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        article = self.get_object(pk)
+        serializer = ArticleModelSerializer(article)
+        return Response(serializer.data)
+
+class ArticleListGenerics(generics.ListAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleModelSerializer
+
+class ArticleDetailGen(generics.RetrieveAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleModelSerializer

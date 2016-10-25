@@ -40,7 +40,7 @@ urlpatterns = [
     url(r'^profile/pwd_change/$', pwd_post, name='pwd_post'),
     url(r'^profile/$', profile, name='profile'),
     url(r'^my/$', my, name='my'),
-    url(r'^', include('app.urls')),
+    url(r'^', include('app.rest_urls')),
 
 ]
 
