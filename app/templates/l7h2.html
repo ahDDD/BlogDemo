@@ -16,41 +16,45 @@
         {% endblock %}
         <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title" charset="utf-8">
         <link rel="stylesheet" href="{% static 'base.css' %}" media="screen" title="no title">
+
         <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/vue.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
     </head>
     <body>
         <div class="ui basic vertical inverted red segment masthead">
             <div class="ui text menu masthead">
                 <div class="ui image masthead">
-                    <a href="{% url 'index' '' '' %}"><img src="{% static 'images/tenlogo.png' %}" alt="" /></a>
+                    <a href="{% url 'index' '' '' %}"><img src="{% static 'images/tenlogo.png' %}" alt=""/></a>
                 </div>
                 <div class="right menu">
                     {% if request.user.is_authenticated %}
-                    <div class="item">
-                        <div class="ui dropdown right item">
-                            {{ request.user.username }}
-                            <i class="dropdown icon"></i>
-                            <div class="menu">
-                                <a href="{% url 'my' %}" class="ui button item">我的</a>
-                                <button class="ui button item">
-                                    <a href="{% url 'profile' %}">Profile</a>
-                                </button>
-                                <button class="ui button item">
-                                    <a href="{% url 'index_logout' %}">Logout</a>
-                                </button>
+                        <div class="item">
+                            <div class="ui dropdown right item">
+                                {{ request.user.username }}
+                                <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <a href="{% url 'my' %}" class="ui button item">我的</a>
+                                    <button class="ui button item">
+                                        <a href="{% url 'profile' %}">Profile</a>
+                                    </button>
+                                    <button class="ui button item">
+                                        <a href="{% url 'index_logout' %}">Logout</a>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="item">
-                        <a href="{% url 'index_logout' %}" class="ui inverted circular button">Logout</a>
-                    </div>
+                        <div class="item">
+                            <a href="{% url 'index_logout' %}" class="ui inverted circular button">Logout</a>
+                        </div>
                     {% else %}
                         <div class="ui item">
-                            <p>你还没有登录, <a href="{% url 'login' %}">点击登录</a></p>
+                            <p>你还没有登录,
+                                <a href="{% url 'login' %}">点击登录</a>
+                            </p>
                         </div>
                     {% endif %}
-
 
                 </div>
             </div>
@@ -59,88 +63,156 @@
         <div class="ui vertical basic segment banner"></div>
 
         {% block content %}
-        <div class="ui basic segment menu">
-            <div class="ui borderless text menu">
-                <div class="ui dropdown item">
-                    Catalogues
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        {% if 'tech' in request.path %}
-                            <a class="active item" href="{% url 'index' 'tech' '' %}" >Tech</a>
-                        {% else %}
-                            <a class="item" href="{% url 'index' 'tech' '' %}" >Tech</a>
-                        {% endif %}
+            <div class="ui basic segment menu">
+                <div class="ui borderless text menu">
+                    <div class="ui dropdown item">
+                        Catalogues
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            {% if 'tech' in request.path %}
+                                <a class="active item" href="{% url 'index' 'tech' '' %}">Tech</a>
+                            {% else %}
+                                <a class="item" href="{% url 'index' 'tech' '' %}">Tech</a>
+                            {% endif %}
 
-                        {% if 'life' in request.path %}
-                            <a class="active item" href="{% url 'index' 'life' '' %}" >Life</a>
-                        {% else %}
-                            <a class="item" href="{% url 'index' 'life' '' %}" >Life</a>
-                        {% endif %}
+                            {% if 'life' in request.path %}
+                                <a class="active item" href="{% url 'index' 'life' '' %}">Life</a>
+                            {% else %}
+                                <a class="item" href="{% url 'index' 'life' '' %}">Life</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="{% url 'index' request.path|what_tag '/sort' %}" class="item">Popular</a>
+                    <div class="item">
+                        About
                     </div>
                 </div>
-                <a href="{% url 'index' request.path|what_tag '/sort' %}" class="item">Popular</a>
-                <div class="item">
-                    About
+            </div>
+            <div class="ui basic segment content">
+                {% if request.user.is_authenticated %}
+                    <p style="color: grey">
+                        <i class="info circle icon"></i>Last Visit:
+                        {{ user.last_visit_dt|date:"Y-m-d G:i" }}
+                    </p>
+                {% else %}
+                {% endif %}
+
+                <div id="app">
+                    <template v-for="article in articles">
+                        <a :href="article.detail_url">
+                            <h2 class="ui header" v-text="article.header"></h2>
+                        </a>
+                        <p class="sub header">
+                            <i class="ui calendar icon"></i>[[ article.put_time ]]
+                            |
+                            <i class="ui unhide icon"></i>[[ article.click_rate ]]
+                        </p>
+                        <a class="ui tag label" href="#">[[ article.tag ]]</a>
+                        <div class="ui divider"></div>
+                    </template>
+                    <div class="ui secondary menu">
+                        <template v-if="data.previous">
+                            <button @click="fetchArticleByNum(1)" class="item">
+                                <i class="angle double left icon"></i>
+                            </button>
+                            <button @click="fetchArticle(data.previous)" class="item">
+                                <i class="angle left icon"></i>
+                            </button>
+                        </template>
+                        <template v-else>
+                            <button href="#" class="disabled item">
+                                <i class="disabled angle left icon"></i>
+                            </button>
+                        </template>
+
+                        <template v-for="page in data.range">
+                            <template v-if='page == data.number'>
+                                <button @click="fetchArticleByNum(page)" class="active item">[[ page ]]</button>
+                            </template>
+                            <template v-else>
+                                <button @click="fetchArticleByNum(page)" class="item">[[ page ]]</button>
+                            </template>
+                        </template>
+
+                        <template v-if='data.next'>
+                            <button @click='fetchArticle(data.next)' class="item">
+                                <i class="angle right icon"></i>
+                            </button>
+                            <button @click="fetchArticleByNum(data.page_count)" class="item">
+                                <i class="angle double right icon"></i>
+                            </button>
+                        </template>
+                        <template v-else>
+                            <a href="#" class="disabled item">
+                                <i class="disabled angle right icon"></i>
+                            </a>
+                        </template>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="ui basic segment content">
-            {% if request.user.is_authenticated %}
-                <p style="color: grey">
-                    <i class="info circle icon"></i>Last Visit:  {{ user.last_visit_dt|date:"Y-m-d G:i" }}
-                </p>
-            {% else %}
-            {% endif %}
-            {% for article in articles %}
-                <a href="{% url 'detail' article.id request.path|yesno_tag:article.tag %}">
-                    <h2 class="ui header">{{ article.header }}</h2>
-                </a>
-
-                <p class="sub header">
-                    <i class="ui calendar icon"></i>{{ article.put_time }} |
-                    <i class="ui unhide icon"></i>{{ article.click_rate }}
-                </p>
-                <p>
-                    {{ article.content|truncatewords:20 }}
-                </p>
-                <a class="ui tag label" href="{% url 'index' article.tag '' %}">{{ article.tag }}</a>
-                <div class="ui divider"></div>
-            {% endfor %}
-            <div class="ui secondary menu">
-                {% if articles.has_previous %}
-                    <a href="?page=1" class="item"><i class="angle double left icon"></i></a>
-                    <a href="?page={{ articles.previous_page_number }}" class="item"><i class="angle left icon"></i></a>
-
-                {% else %}
-                    <a href="#" class="disabled item"><i class="disabled angle left icon"></i></a>
-
-                {% endif %}
-
-                {% for i in paginator.page_range|range:articles.number %}
-                    {% if articles.number == i %}
-                        <a href="?page={{ i }}" class="active item">{{ i }}</a>
-                    {% else %}
-                        <a href="?page={{ i }}" class="item">{{ i }}</a>
-                    {% endif %}
-
-                {% endfor %}
-
-                {% if articles.has_next %}
-                    <a href="?page={{ articles.next_page_number }}" class="item"><i class="angle right icon"></i></a>
-                    <a href="?page={{ paginator.num_pages }}" class="item"><i class="angle double right icon"></i></a>
-
-                {% else %}
-                    <a href="#" class="disabled item"><i class="disabled angle right icon"></i></a>
-
-                {% endif %}
-
-            </div>
-
-        </div>
         {% endblock %}
         <div class="ui vertical very padded inverted segment">
             Muggle Coding ®
         </div>
-    <script type="text/javascript">$('.ui.dropdown').dropdown();</script>
+
+        <script type="text/javascript">
+            $('.ui.dropdown').dropdown();
+        </script>
+        <script>
+            new Vue({
+                delimiters: ['[[', ']]'],
+                el: '#app',
+                data: {
+                    data: [],
+                    articles: [],
+                },
+                created: function () {
+                    this.page = this.getUrlParams().page;
+                    this.fetchArticle();
+                },
+                methods: {
+                    getUrlParams: function (url) {
+                        var search = url
+                                ? (url.split('?')[1] || '')
+                                : window.location.search.substr(1),
+                            paramArray = search.split('&'),
+                            paramObj = {};
+                        for (var i = 0; i < paramArray.length; i++) {
+                            // 将每个键值按 '=' 拆分
+                            var param = paramArray[i].split('=');
+                            // 参数值需要 decodeURI
+                            paramObj[param[0]] = decodeURI(param[1] || '');
+                        }
+                        return paramObj;
+                    },
+                    fetchArticle: function (url) {
+                        if (url) {
+                            this.$http.get(url).then((response) => {
+                                // success callback
+                                this.data = response.body;
+                                this.articles = this.data.results;
+                            }, (response) => {
+                                // error callback
+                                console.log("error");
+                            });
+                        }
+                        else {
+                            this.$http.get(`http://127.0.0.1:8000/articles/`).then((response) => {
+                                // success callback
+                                this.data = response.body;
+                                this.articles = this.data.results;
+                            }, (response) => {
+                                // error callback
+                                console.log("error");
+                            });
+                        }
+                    },
+                    fetchArticleByNum: function(page_num){
+                        url = `http://127.0.0.1:8000/articles/?page=${page_num}`;
+                        this.fetchArticle(url);
+                    }
+                }
+            })
+        </script>
     </body>
 </html>

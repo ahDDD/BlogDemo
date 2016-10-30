@@ -169,4 +169,43 @@
             $('.over').transition('scale');
         });
     </script>
+    <script>
+        new Vue({
+            delimiters: ['[[', ']]'],
+            el: '#app',
+            data: {
+                articles: [],
+                page: {}
+            },
+            created: function () {
+                this.page = this.getUrlParams().page;
+                this.fetchArticle(this.page);
+            },
+            methods: {
+                getUrlParams: function (url) {
+                    var search = url
+                            ? (url.split('?')[1] || '')
+                            : window.location.search.substr(1),
+                        paramArray = search.split('&'),
+                        paramObj = {};
+                    for (var i = 0; i < paramArray.length; i++) {
+                        // 将每个键值按 '=' 拆分
+                        var param = paramArray[i].split('=');
+                        // 参数值需要 decodeURI
+                        paramObj[param[0]] = decodeURI(param[1] || '');
+                    }
+                    return paramObj;
+                },
+                fetchArticle: function (page) {
+                    this.$http.get(`http://127.0.0.1:8000/article/?page=${page}`).then((response) => {
+                        // success callback
+                        this.articles = response.body;
+                    }, (response) => {
+                        // error callback
+                        console.log("error");
+                    });
+                }
+            }
+        })
+        </script>
 {% endblock %}

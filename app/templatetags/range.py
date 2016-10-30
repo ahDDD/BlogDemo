@@ -3,9 +3,7 @@ register = template.Library()
 
 @register.filter(name='range')
 def range(value, page_num):
-    '''
-    if you want to replace the ','  I'm sorry, I can't help you
-    '''
+
     if page_num - 3 < 0:
         lists = list(value)[:5]
     elif page_num + 2 > len(value):

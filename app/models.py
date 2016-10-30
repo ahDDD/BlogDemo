@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 from faker import Factory
 
 # Create your models here.
@@ -44,6 +45,7 @@ class Article(models.Model):
 
     def __str__(self):
         return self.header
+
 
 class Comment(models.Model):
     name = models.CharField(null=True, blank=True, max_length=50)

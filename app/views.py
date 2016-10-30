@@ -20,13 +20,16 @@ import datetime
 
 # RsST
 from django.views.decorators.csrf import csrf_exempt
-from app.serializers import ArticleModelSerializer
+from app.serializers import ArticleModelSerializer, ArticlesModelSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
+from collections import OrderedDict
+
 # Create your views here.
 
 def index(request, tag=None, sort=None):
@@ -235,6 +238,13 @@ def article_list(request):
     默认在GET情况下
     """
     articles = Article.objects.all()
+    paginator = Paginator(articles, 5)
+    try:
+        articles =  paginator.page(request.GET.get('page'))
+    except EmptyPage:
+        articles =  paginator.page(paginator.num_pages)
+    except PageNotAnInteger:
+        articles =  paginator.page(1)
     serializer = ArticleModelSerializer(articles, many=True)
     return Response(serializer.data)
 
@@ -270,9 +280,59 @@ class ArticleDetail(APIView):
         serializer = ArticleModelSerializer(article)
         return Response(serializer.data)
 
+class ArticlePage(APIView):
+
+    def get_object(self, page_num):
+        articles = Article.objects.all()
+        paginator = Paginator(articles, 10)
+        try:
+            articles = paginator.page(page_num)
+            return articles
+        except EmptyPage:
+            return paginator.page(paginator.num_pages)
+        except PageNotAnInteger:
+            return paginator.page(1)
+
+    def get(self, request):
+        articles = self.get_object(page_num=request.GET.get('page'))
+        serializer = ArticlesModelSerializer(articles, many=True)
+        return Response(serializer.data)
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def page_range(self):
+        value = [i for i in range(1,self.page.paginator.num_pages + 1)]
+        if self.page.number - 3 < 0:
+            lists = value[:5]
+        elif self.page.number + 2 > len(value):
+            lists = value[-5:]
+        else:
+            lists = value[self.page.number-3:self.page.number+2]
+        return lists
+
+    def get_paginated_response(self, data):
+        p_r = self.page_range()
+        return Response(
+            OrderedDict([
+                ('range', p_r),
+                ('number', self.page.number),
+                ('total_count', self.page.paginator.count),
+                ('page_count', self.page.paginator.num_pages),
+                ('next', self.get_next_link()),
+                ('previous', self.get_previous_link()),
+                ('results', data)
+            ])
+        )
+
+
 class ArticleListGenerics(generics.ListAPIView):
     queryset = Article.objects.all()
-    serializer_class = ArticleModelSerializer
+    serializer_class = ArticlesModelSerializer
+    pagination_class = StandardResultsSetPagination
 
 class ArticleDetailGen(generics.RetrieveAPIView):
     queryset = Article.objects.all()
